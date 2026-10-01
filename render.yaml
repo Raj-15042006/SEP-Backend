@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: sep-backend
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: local
+      - key: PORT
+        value: 8080
+    healthCheckPath: /actuator/health

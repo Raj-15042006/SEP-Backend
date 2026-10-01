@@ -1,0 +1,106 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+  compression:
+    enabled: true
+    mime-types: application/json,text/html,text/xml,text/plain,application/javascript,text/css
+    min-response-size: 1024
+
+spring:
+  application:
+    name: skills-passport-backend
+  
+  threads:
+    virtual:
+      enabled: ${ENABLE_VIRTUAL_THREADS:false} # Safe on Java 17; set ENABLE_VIRTUAL_THREADS=true on Java 21+
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:h2:file:./build/h2/passport_db;DB_CLOSE_DELAY=-1;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH}
+    username: ${SPRING_DATASOURCE_USERNAME:sa}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER:org.h2.Driver}
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 300000
+      max-lifetime: 600000
+      connection-timeout: 20000
+      pool-name: PassportHikariCP
+  
+  jpa:
+    hibernate:
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+    show-sql: false
+    open-in-view: false # Eliminates memory leaks and open DB connections across view rendering
+    properties:
+      hibernate:
+        format_sql: false
+        default_batch_fetch_size: 50 # Batch queries to eliminate N+1 problem
+        order_inserts: true
+        order_updates: true
+        jdbc:
+          batch_size: 25
+        query:
+          plan_cache_max_size: 2048
+  
+  flyway:
+    enabled: ${FLYWAY_ENABLED:false}
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: ${REDIS_TIMEOUT:2000ms}
+      connect-timeout: 2000ms
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      compression-type: snappy
+    consumer:
+      group-id: passport-verification-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+
+ratelimit:
+  enabled: ${RATELIMIT_ENABLED:true}
+  default-capacity: ${RATELIMIT_DEFAULT_CAPACITY:120}
+  default-refill-rate: ${RATELIMIT_DEFAULT_REFILL_RATE:2.0}
+  auth-capacity: ${RATELIMIT_AUTH_CAPACITY:20}
+  auth-refill-rate: ${RATELIMIT_AUTH_REFILL_RATE:0.333}
+  use-redis: ${RATELIMIT_USE_REDIS:true}
+
+minio:
+  endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
+  accessKey: ${MINIO_ACCESS_KEY:admin}
+  secretKey: ${MINIO_SECRET_KEY:password123}
+  bucketName: ${MINIO_BUCKET_NAME:evidence-artefacts}
+
+supabase:
+  url: ${SUPABASE_URL:https://lwyknurgoianubqadfsr.supabase.co}
+  anonKey: ${SUPABASE_ANON_KEY:YOUR_SUPABASE_ANON_KEY}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html

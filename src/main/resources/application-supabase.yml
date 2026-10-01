@@ -1,0 +1,32 @@
+# ====================================================================
+# Skills Evidence Passport — Supabase PostgreSQL Configuration
+# ====================================================================
+
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://aws-0-ap-south-1.pooler.supabase.com:6543/postgres?sslmode=require}
+    username: ${SUPABASE_DB_USER:postgres.your_project_id}
+    password: ${SUPABASE_DB_PASSWORD:YOUR-PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 300000
+      max-lifetime: 600000
+      connection-timeout: 20000
+      pool-name: SupabaseHikariCP
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_batch_fetch_size: 50
+        jdbc:
+          batch_size: 25
+
+  flyway:
+    enabled: false # Supabase uses web console migrations / DDL scripts

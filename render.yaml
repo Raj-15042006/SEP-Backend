@@ -5,9 +5,25 @@ services:
     plan: free
     region: singapore
     dockerfilePath: ./Dockerfile
+    healthCheckPath: /actuator/health
     envVars:
       - key: SPRING_PROFILES_ACTIVE
-        value: local
-      - key: PORT
-        value: 8080
-    healthCheckPath: /actuator/health
+        value: supabase
+      - key: RATELIMIT_USE_REDIS
+        value: false
+      - key: RATELIMIT_ENABLED
+        value: true
+      - key: FRONTEND_URL
+        value: https://skillevidencepassport.netlify.app
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_DB_USER
+        sync: false
+      - key: SUPABASE_DB_PASSWORD
+        sync: false
+      - key: PASSPORT_SECURITY_JWT_SECRET
+        sync: false

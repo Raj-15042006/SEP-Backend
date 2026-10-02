@@ -31,6 +31,9 @@ import java.util.stream.Collectors;
 @lombok.RequiredArgsConstructor
 public class SecurityConfig {
 
+    @org.springframework.beans.factory.annotation.Value("${app.frontend-url:https://skillevidencepassport.netlify.app}")
+    private String frontendUrl;
+
     private final TokenAuthenticationFilter tokenAuthenticationFilter;
 
     @Bean
@@ -75,13 +78,17 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        // Restrict CORS strictly to trusted frontend origins (prevent wildcard with credentials CWE-942)
-        config.setAllowedOrigins(List.of(
+        List<String> origins = new java.util.ArrayList<>(List.of(
             "http://localhost:5173",
             "http://127.0.0.1:5173",
             "http://localhost:8080",
-            "http://127.0.0.1:8080"
+            "http://127.0.0.1:8080",
+            "https://skillevidencepassport.netlify.app"
         ));
+        if (frontendUrl != null && !frontendUrl.isBlank() && !origins.contains(frontendUrl)) {
+            origins.add(frontendUrl);
+        }
+        config.setAllowedOrigins(origins);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of(
             "Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With", "Cache-Control"

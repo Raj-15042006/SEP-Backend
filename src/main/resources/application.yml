@@ -13,6 +13,8 @@ app:
 spring:
   application:
     name: skills-passport-backend
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:supabase}
   
   threads:
     virtual:
@@ -98,6 +100,9 @@ management:
   endpoint:
     health:
       show-details: always
+  health:
+    redis:
+      enabled: false
   metrics:
     export:
       prometheus:

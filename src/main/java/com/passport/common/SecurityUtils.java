@@ -35,6 +35,14 @@ public final class SecurityUtils {
         throw new AccessDeniedException("Access denied: Operation requires an authenticated user session.");
     }
 
+    public static java.util.Optional<UUID> getCurrentUserIdOptional() {
+        try {
+            return java.util.Optional.of(getCurrentUserId());
+        } catch (AccessDeniedException e) {
+            return java.util.Optional.empty();
+        }
+    }
+
     public static String getCurrentUserEmail() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {

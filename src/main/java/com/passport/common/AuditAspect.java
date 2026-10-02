@@ -20,13 +20,15 @@ public class AuditAspect {
 
     @Around("@annotation(audited)")
     public Object auditMethod(ProceedingJoinPoint joinPoint, Audited audited) throws Throwable {
-        UUID actorId = SecurityUtils.getCurrentUserId();
+        String actor = SecurityUtils.getCurrentUserIdOptional()
+            .map(UUID::toString)
+            .orElse("SYSTEM_INITIALIZER");
         Object result = joinPoint.proceed();
 
         try {
             String resourceId = audited.resourceType() + ":" + joinPoint.getSignature().getName();
             auditService.record(
-                actorId.toString(),
+                actor,
                 audited.action(),
                 resourceId,
                 "Args count: " + joinPoint.getArgs().length
